@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>조하준 소장 | BLESS ALPHA</title>
+<title>조하준 소장 | Bless Alpha</title>
 <meta name="description" content="조하준 소장 · 010-5909-2567 · joseph@blessalpha.com">
 <meta property="og:type" content="profile">
-<meta property="og:title" content="조하준 소장 | BLESS ALPHA">
+<meta property="og:title" content="조하준 소장 | Bless Alpha">
 <meta property="og:description" content="010-5909-2567 · joseph@blessalpha.com · 눌러서 연락처 저장">
 <meta property="og:url" content="https://febrile-hj.github.io/card/">
-<meta property="og:image" content="https://febrile-hj.github.io/card/og.png">
+<meta property="og:image" content="https://febrile-hj.github.io/card/og.png?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0b1f3a">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1f3a'/%3E%3Ctext x='32' y='42' font-size='28' font-family='Georgia,serif' fill='%23d4af6a' text-anchor='middle'%3EJC%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1f3a'/%3E%3Ctext x='32' y='42' font-size='28' font-family='Georgia,serif' fill='%23d4af6a' text-anchor='middle'%3EBA%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
   :root{--navy:#0b1f3a;--navy2:#13325c;--gold:#d4af6a;--gold2:#f1d9a6;--ink:#1b2430;--muted:#6b7684;--bg:#f3f1ec;--line:#e6e1d6}
@@ -26,7 +26,7 @@
     box-shadow:0 18px 40px -18px rgba(11,31,58,.55);aspect-ratio:1.7/1;display:flex;flex-direction:column;justify-content:space-between}
   .card:after{content:"";position:absolute;right:-60px;bottom:-60px;width:200px;height:200px;border:1px solid rgba(212,175,106,.35);border-radius:50%}
   .card:before{content:"";position:absolute;right:-20px;bottom:-95px;width:200px;height:200px;border:1px solid rgba(212,175,106,.2);border-radius:50%}
-  .brand{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.32em;color:var(--gold2);font-weight:600}
+  .brand{display:flex;align-items:center;gap:10px;font-size:15px;letter-spacing:.06em;color:var(--gold2);font-weight:600}
   .mono{width:34px;height:34px;border-radius:9px;border:1px solid var(--gold);display:grid;place-items:center;font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:15px;letter-spacing:0}
   .who{position:relative;z-index:1}
   .name{font-size:30px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px}
@@ -55,7 +55,7 @@
 <body>
 <main class="wrap">
   <section class="card" aria-label="명함">
-    <div class="brand"><span class="mono">JC</span>BLESS ALPHA</div>
+    <div class="brand"><span class="mono">BA</span>Bless Alpha</div>
     <div class="who">
       <div class="name">조하준 <small>소장</small></div>
       <div class="en">Joseph Cho · Director</div>
@@ -84,16 +84,16 @@
     <button class="share" id="share">카톡 등으로 명함 공유하기</button>
   </section>
 
-  <p class="foot">BLESS ALPHA · JOSEPH CHO</p>
+  <p class="foot">Bless Alpha · Joseph Cho</p>
 </main>
 <div class="toast" id="toast">명함 내용이 복사됐어요</div>
 <script>
   const url = 'https://febrile-hj.github.io/card/';
-  const cardText = '[명함] 조하준 소장 (BLESS ALPHA)\nJoseph Cho\n휴대폰 010-5909-2567\n이메일 joseph@blessalpha.com\n주소 서울시 강동구 고덕로28길 10-9, 1층\n명함 보기·연락처 저장: ' + url;
+  const cardText = '[명함] 조하준 소장 (Bless Alpha)\nJoseph Cho\n휴대폰 010-5909-2567\n이메일 joseph@blessalpha.com\n주소 서울시 강동구 고덕로28길 10-9, 1층\n명함 보기·연락처 저장: ' + url;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   document.getElementById('smsBtn').href = (isIOS ? 'sms:&body=' : 'sms:?body=') + encodeURIComponent(cardText);
   document.getElementById('share').addEventListener('click', async () => {
-    if (navigator.share) { try { await navigator.share({ title: '조하준 소장 | BLESS ALPHA', text: cardText.replace('\n명함 보기·연락처 저장: ' + url, '\n명함 보기·연락처 저장:'), url }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+    if (navigator.share) { try { await navigator.share({ title: '조하준 소장 | Bless Alpha', text: cardText.replace('\n명함 보기·연락처 저장: ' + url, '\n명함 보기·연락처 저장:'), url }); return; } catch (e) { if (e.name === 'AbortError') return; } }
     try { await navigator.clipboard.writeText(cardText); } catch (e) { const t = document.createElement('textarea'); t.value = cardText; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
     const el = document.getElementById('toast'); el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 1800);
   });
