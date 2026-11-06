@@ -56,6 +56,19 @@
   .foot{margin-top:18px;text-align:center;font-size:11px;color:#a3a9b1;letter-spacing:.04em}
   .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:rgba(27,36,48,.92);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
   .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .sheet-bg{position:fixed;inset:0;background:rgba(11,20,36,.55);display:none;z-index:50}
+  .sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:22px 22px 0 0;padding:22px 22px max(22px,env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .28s ease;z-index:51;max-width:480px;margin:0 auto;box-shadow:0 -10px 30px rgba(0,0,0,.2)}
+  .sheet.on{transform:none}.sheet-bg.on{display:block}
+  .sheet h3{font-size:19px;font-weight:800;color:var(--ink);margin-bottom:12px}
+  .sheet ol{padding-left:0;list-style:none;display:grid;gap:10px;margin-bottom:16px}
+  .sheet li{display:flex;gap:10px;font-size:15px;line-height:1.5;color:var(--ink)}
+  .sheet li b.n{flex:0 0 24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;display:grid;place-items:center;margin-top:1px}
+  .sheet p.tip{font-size:13px;color:var(--muted);margin:-6px 0 14px}
+  .sheet .sbtn{display:block;width:100%;text-align:center;padding:15px;border-radius:14px;background:var(--navy);color:#fff;font-size:16px;font-weight:700;text-decoration:none;border:0;font-family:inherit;margin-top:8px}
+  .sheet .sbtn.line{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+  .save.pulse{animation:pulse 1.2s ease 3}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04);box-shadow:0 0 0 6px rgba(212,175,106,.45)}}
 </style>
 </head>
 <body>
@@ -79,7 +92,7 @@
     <a class="act" href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%20%EA%B0%95%EB%8F%99%EA%B5%AC%20%EA%B3%A0%EB%8D%95%EB%A1%9C28%EA%B8%B8%2010-9" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>지도</a>
   </nav>
 
-  <a class="save" href="joseph-cho.vcf" download="조하준_소장.vcf"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>연락처 저장</a>
+  <a class="save" id="saveBtn" href="joseph-cho.vcf?v=2"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>연락처 저장</a>
 
   <section class="info">
     <a class="row" href="tel:01059092567"><span class="k">휴대폰</span><span class="v">010-5909-2567</span></a>
@@ -108,6 +121,72 @@
     try { await navigator.clipboard.writeText(withLink); } catch (e) { const t = document.createElement('textarea'); t.value = withLink; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
     const el = document.getElementById('toast'); el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 1800);
   });
+</script>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-live="polite"></div>
+<script>
+  // 2026-11-06: 연락처 저장을 폰·브라우저별로 '저장 화면'까지 바로 가게 한다.
+  (function(){
+    const VCF = 'https://blessalpha.com/card/joseph-cho.vcf?v=2';
+    const SELF = 'https://blessalpha.com/card/?save=1';
+    const ua = navigator.userAgent;
+    const isIOSd = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+    const isKakao = /KAKAOTALK/i.test(ua);
+    const isInApp = isKakao || /Instagram|FBAN|FBAV|FB_IAB|NAVER\(inapp|Line\/|DaumApps|everytimeApp|BAND\/|; wv\)/i.test(ua);
+    const isIOSSafari = isIOSd && /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|Whale|NAVER|KAKAOTALK|Instagram|FBAN|Line\//i.test(ua);
+    const sheet = document.getElementById('sheet'), bg = document.getElementById('sheetBg');
+    function go(u){ window.__lastNav = u; if (window.__noNav) return; location.href = u; }
+    function hide(){ sheet.classList.remove('on'); bg.classList.remove('on'); }
+    bg.addEventListener('click', hide);
+    function copyLink(){ const u = 'https://blessalpha.com/card/'; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).catch(()=>{ const t=document.createElement('textarea'); t.value=u; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }); const b=document.getElementById('cpBtn'); if (b) b.textContent='링크를 복사했어요'; }
+    function show(kind){
+      const steps = {
+        android: ['<h3>연락처 저장, 거의 다 됐어요</h3>', ['화면 아래(또는 위 알림창)에 뜬 <b>joseph-cho.vcf</b> 다운로드 알림에서 <b>[열기]</b>를 누르세요.', '<b>연락처</b> 앱을 고르고 <b>[저장]</b>(또는 [가져오기])을 누르면 끝이에요.'], '알림이 안 보이면 화면 맨 위를 아래로 내려 알림창을 확인해 주세요.', '<a class="sbtn" href="'+VCF+'">연락처 파일 다시 받기</a><button class="sbtn line" data-close>닫기</button>'],
+        ios: ['<h3>Safari에서 열면 바로 저장돼요</h3>', ['아래 버튼으로 링크를 복사하세요.', '<b>Safari</b>를 열고 주소창에 붙여넣은 뒤, <b>[연락처 저장]</b>을 누르세요.', '연락처 화면에서 <b>[새로운 연락처 생성]</b>을 누르면 끝이에요.'], '', '<button class="sbtn" id="cpBtn">명함 링크 복사</button><button class="sbtn line" data-close>닫기</button>'],
+        inapp: ['<h3>이 앱 안에서는 저장이 안 돼요</h3>', ['화면 위나 아래의 <b>··· 메뉴</b>를 누르세요.', '<b>Safari로 열기</b>(또는 다른 브라우저로 열기)를 누르세요.', '열린 화면에서 <b>[연락처 저장]</b>을 다시 누르면 돼요.'], '메뉴가 없으면 링크를 복사해서 Safari에 붙여넣어 주세요.', '<button class="sbtn" id="cpBtn">명함 링크 복사</button><button class="sbtn line" data-close>닫기</button>'],
+        again: ['<h3>아래 버튼을 누르면 연락처에 저장돼요</h3>', [], '', '<button class="sbtn" id="againBtn">연락처 저장</button><button class="sbtn line" data-close>닫기</button>']
+      }[kind];
+      sheet.innerHTML = steps[0] + (steps[1].length ? '<ol>' + steps[1].map((t,i)=>'<li><b class="n">'+(i+1)+'</b><span>'+t+'</span></li>').join('') + '</ol>' : '') + (steps[2] ? '<p class="tip">'+steps[2]+'</p>' : '') + steps[3];
+      sheet.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', hide));
+      const cp = document.getElementById('cpBtn'); if (cp) cp.addEventListener('click', copyLink);
+      const ag = document.getElementById('againBtn'); if (ag) ag.addEventListener('click', e => { hide(); save(e); });
+      bg.classList.add('on'); requestAnimationFrame(() => sheet.classList.add('on'));
+      window.__sheet = kind;
+    }
+    function androidIntent(){
+      const e = encodeURIComponent;
+      return 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/raw_contact'
+        + ';S.name=' + e('조하준') + ';S.phone=' + e('010-5909-2567') + ';i.phone_type=2'
+        + ';S.email=' + e('joseph@blessalpha.com') + ';S.company=' + e('블레스알파랩 (BlessAlpha Lab)')
+        + ';S.job_title=' + e('소장') + ';S.postal=' + e('서울특별시 강동구 고덕로28길 10-9, 1층 (BLESS LAB)')
+        + ';S.notes=' + e('Joseph Cho · https://blessalpha.com')
+        + ';S.browser_fallback_url=' + e(VCF) + ';end';
+    }
+    function save(ev){
+      if (ev) ev.preventDefault();
+      if (isInApp) {
+        if (isKakao) { go('kakaotalk://web/openExternal?url=' + encodeURIComponent(SELF)); return; }
+        if (isAndroid) { go('intent://blessalpha.com/card/?save=1#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(VCF) + ';end'); return; }
+        show('inapp'); return;
+      }
+      if (isIOSd) { if (isIOSSafari) { go(VCF); } else { show('ios'); } return; }
+      if (isAndroid) {
+        go(androidIntent());
+        setTimeout(() => { if (document.visibilityState === 'visible') show('android'); }, 1600);
+        return;
+      }
+      const a = document.createElement('a'); a.href = VCF; a.download = '조하준_소장.vcf'; document.body.appendChild(a); window.__lastNav = 'download:' + VCF; if (!window.__noNav) a.click(); a.remove();
+    }
+    window.__save = save;
+    document.getElementById('saveBtn').addEventListener('click', save);
+    if (new URLSearchParams(location.search).get('save') === '1') {
+      const btn = document.getElementById('saveBtn');
+      if (isIOSSafari) { setTimeout(() => go(VCF), 500); }
+      else { btn.classList.add('pulse'); setTimeout(() => show('again'), 400); }
+    }
+  })();
 </script>
 </body>
 </html>
