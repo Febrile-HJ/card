@@ -84,7 +84,7 @@
   <section class="info">
     <a class="row" href="tel:01059092567"><span class="k">휴대폰</span><span class="v">010-5909-2567</span></a>
     <a class="row" href="mailto:joseph@blessalpha.com"><span class="k">이메일</span><span class="v">joseph@blessalpha.com</span></a>
-    <div class="row"><span class="k">웹사이트</span><span class="v">blessalpha.com</span></div>
+    <a class="row" href="https://blessalpha.com/" target="_blank" rel="noopener"><span class="k">웹사이트</span><span class="v">blessalpha.com</span></a>
     <a class="row" href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%20%EA%B0%95%EB%8F%99%EA%B5%AC%20%EA%B3%A0%EB%8D%95%EB%A1%9C28%EA%B8%B8%2010-9" target="_blank" rel="noopener"><span class="k">주소</span><span class="v"><em>BLESS LAB</em>서울특별시 강동구 고덕로28길 10-9, 1층</span></a>
   </section>
 
@@ -99,12 +99,13 @@
 <div class="toast" id="toast">명함 내용이 복사됐어요</div>
 <script>
   const url = 'https://blessalpha.com/card/';
-  const cardText = '[명함] 조하준 소장 (Joseph Cho)\n블레스알파랩 BlessAlpha Lab\nAI 교육 & 강의 / 업무 자동화 컨설팅\nM. 010-5909-2567\nE. joseph@blessalpha.com\nW. blessalpha.com\n주소 서울특별시 강동구 고덕로28길 10-9, 1층 (BLESS LAB)\n명함 보기·연락처 저장: ' + url;
+  const cardText = '조하준 소장 (Joseph Cho)\n블레스알파랩 BlessAlpha Lab\nAI 교육 & 강의 / 업무 자동화 컨설팅\n010-5909-2567\njoseph@blessalpha.com\n서울특별시 강동구 고덕로28길 10-9, 1층 (BLESS LAB)';
+  const withLink = cardText + '\n' + url;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  document.getElementById('smsBtn').href = (isIOS ? 'sms:&body=' : 'sms:?body=') + encodeURIComponent(cardText);
+  document.getElementById('smsBtn').href = (isIOS ? 'sms:&body=' : 'sms:?body=') + encodeURIComponent(withLink);
   document.getElementById('share').addEventListener('click', async () => {
-    if (navigator.share) { try { await navigator.share({ title: '조하준 소장 | 블레스알파랩', text: cardText.replace('\n명함 보기·연락처 저장: ' + url, '\n명함 보기·연락처 저장:'), url }); return; } catch (e) { if (e.name === 'AbortError') return; } }
-    try { await navigator.clipboard.writeText(cardText); } catch (e) { const t = document.createElement('textarea'); t.value = cardText; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    if (navigator.share) { try { await navigator.share({ text: cardText, url }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+    try { await navigator.clipboard.writeText(withLink); } catch (e) { const t = document.createElement('textarea'); t.value = withLink; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
     const el = document.getElementById('toast'); el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 1800);
   });
 </script>
