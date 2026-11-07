@@ -86,6 +86,11 @@
   .foot{color:#a8998b}
   .toast{background:rgba(43,33,27,.92)}
   .sheet-bg{background:rgba(43,33,27,.5)}
+  /* 2026-11-07: 갤럭시 연락처 저장 안내를 팝업 대신 버튼 아래 한 줄로 */
+  .hint{margin-top:10px;padding:14px 12px;border-radius:14px;background:#fffaf2;border:1.5px solid #c9a27e;text-align:center}
+  .hint p{font-size:18px;font-weight:800;color:var(--ink);line-height:1.5}
+  .hint .k{display:inline-block;padding:1px 10px;border-radius:8px;background:var(--navy);color:#fff}
+  .hint small{display:block;margin-top:6px;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -110,6 +115,7 @@
   </nav>
 
   <a class="save" id="saveBtn" href="joseph-cho.vcf?v=4"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>연락처 저장</a>
+  <div class="hint" id="saveHint" hidden><p>알림에서 <b class="k">열기</b> → <b class="k">저장</b></p><small>알림이 안 보이면 화면 맨 위를 아래로 내려 보세요</small></div>
 
   <section class="info">
     <a class="row" href="tel:01059092567"><span class="k">휴대폰</span><span class="v">010-5909-2567</span></a>
@@ -160,7 +166,6 @@
     function copyLink(){ const u = 'https://blessalpha.com/card/'; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).catch(()=>{ const t=document.createElement('textarea'); t.value=u; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }); const b=document.getElementById('cpBtn'); if (b) b.textContent='링크를 복사했어요'; }
     function show(kind){
       const steps = {
-        android: ['<h3>연락처 저장, 거의 다 됐어요</h3>', ['화면 아래(또는 위 알림창)에 뜬 <b>joseph-cho.vcf</b> 다운로드 알림에서 <b>[열기]</b>를 누르세요.', '<b>연락처</b> 앱을 고르고 <b>[저장]</b>(또는 [가져오기])을 누르면 끝이에요.'], '알림이 안 보이면 화면 맨 위를 아래로 내려 알림창을 확인해 주세요.', '<a class="sbtn" href="'+VCF+'">연락처 파일 다시 받기</a><button class="sbtn line" data-close>닫기</button>'],
         ios: ['<h3>Safari에서 열면 바로 저장돼요</h3>', ['아래 버튼으로 링크를 복사하세요.', '<b>Safari</b>를 열고 주소창에 붙여넣은 뒤, <b>[연락처 저장]</b>을 누르세요.', '연락처 화면에서 <b>[새로운 연락처 생성]</b>을 누르면 끝이에요.'], '', '<button class="sbtn" id="cpBtn">명함 링크 복사</button><button class="sbtn line" data-close>닫기</button>'],
         inapp: ['<h3>이 앱 안에서는 저장이 안 돼요</h3>', ['화면 위나 아래의 <b>··· 메뉴</b>를 누르세요.', '<b>Safari로 열기</b>(또는 다른 브라우저로 열기)를 누르세요.', '열린 화면에서 <b>[연락처 저장]</b>을 다시 누르면 돼요.'], '메뉴가 없으면 링크를 복사해서 Safari에 붙여넣어 주세요.', '<button class="sbtn" id="cpBtn">명함 링크 복사</button><button class="sbtn line" data-close>닫기</button>'],
         again: ['<h3>아래 버튼을 누르면 연락처에 저장돼요</h3>', [], '', '<button class="sbtn" id="againBtn">연락처 저장</button><button class="sbtn line" data-close>닫기</button>']
@@ -172,15 +177,6 @@
       bg.classList.add('on'); requestAnimationFrame(() => sheet.classList.add('on'));
       window.__sheet = kind;
     }
-    function androidIntent(){
-      const e = encodeURIComponent;
-      return 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/raw_contact'
-        + ';S.name=' + e('조하준') + ';S.phone=' + e('010-5909-2567') + ';i.phone_type=2'
-        + ';S.email=' + e('joseph@blessalpha.com') + ';S.company=' + e('블레스알파랩 (BlessAlpha Lab)')
-        + ';S.job_title=' + e('소장') + ';S.postal=' + e('서울특별시 강동구 고덕로28길 10-9, 1층 (BLESS LAB)')
-        + ';S.notes=' + e('Joseph Cho · https://blessalpha.com')
-        + ';S.browser_fallback_url=' + e(VCF) + ';end';
-    }
     function save(ev){
       if (ev) ev.preventDefault();
       if (isInApp) {
@@ -189,13 +185,10 @@
         show('inapp'); return;
       }
       if (isIOSd) { if (isIOSSafari) { go(VCF); } else { show('ios'); } return; }
-      if (isAndroid) {
-        go(androidIntent());
-        setTimeout(() => { if (document.visibilityState === 'visible') show('android'); }, 1600);
-        return;
-      }
-      const a = document.createElement('a'); a.href = VCF; a.download = '조하준_소장.vcf'; document.body.appendChild(a); window.__lastNav = 'download:' + VCF; if (!window.__noNav) a.click(); a.remove();
+      if (isAndroid) { download(); const hn = document.getElementById('saveHint'); hn.hidden = false; window.__hint = true; return; }
+      download();
     }
+    function download(){ const a = document.createElement('a'); a.href = VCF; a.download = '조하준_블레스알파랩.vcf'; document.body.appendChild(a); window.__lastNav = 'download:' + VCF; if (!window.__noNav) a.click(); a.remove(); }
     window.__save = save;
     document.getElementById('saveBtn').addEventListener('click', save);
     if (new URLSearchParams(location.search).get('save') === '1') {
