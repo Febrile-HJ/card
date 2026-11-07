@@ -50,7 +50,11 @@
   .row .v{font-size:15px;font-weight:500;word-break:keep-all;overflow-wrap:anywhere;line-height:1.45}
   .row .v em{display:block;font-style:normal;font-size:12px;font-weight:700;letter-spacing:.08em;color:#8a6a35}
   .qr{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;text-align:center}
-  .qr img{width:180px;height:180px;display:block;margin:0 auto 10px;image-rendering:pixelated}
+  .qr img{width:220px;height:220px;display:block;margin:0 auto 10px;image-rendering:pixelated}
+  /* 2026-11-07: QR 두 가지(직접 저장 / 명함 링크) 고르기 */
+  .qtabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#f4ede2;padding:4px;border-radius:12px;margin-bottom:14px}
+  .qt{padding:11px 4px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-family:inherit;font-size:15px;font-weight:700}
+  .qt.on{background:var(--navy);color:#fff}
   .qr p{font-size:13px;color:var(--muted)}
   .share{margin-top:10px;width:100%;padding:13px;border-radius:12px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:15px;font-weight:600;font-family:inherit}
   .foot{margin-top:18px;text-align:center;font-size:11px;color:#a3a9b1;letter-spacing:.04em}
@@ -125,8 +129,9 @@
   </section>
 
   <section class="qr">
-    <img src="qr.png?v=2" alt="명함 링크 QR 코드">
-    <p>카메라로 스캔하면 이 명함이 열려요</p>
+    <div class="qtabs" role="tablist"><button class="qt on" data-q="contact" role="tab">직접 저장 QR</button><button class="qt" data-q="link" role="tab">명함 링크 QR</button></div>
+    <img id="qrImg" src="qr-contact.png?v=2" alt="연락처 바로 저장 QR 코드">
+    <p id="qrCap">카메라로 찍으면 바로 연락처에 저장돼요</p>
     <button class="share" id="share">카톡 등으로 명함 공유하기</button>
   </section>
 
@@ -146,6 +151,19 @@
   });
 </script>
 
+<script>
+  // 2026-11-07: 직접 저장 QR(연락처를 QR에 담음) / 명함 링크 QR 중 골라 보여 준다. 고른 것은 이 폰에 기억.
+  (function(){
+    const Q = { contact: ['qr-contact.png?v=2', '연락처 바로 저장 QR 코드', '카메라로 찍으면 바로 연락처에 저장돼요'],
+                link: ['qr.png?v=2', '명함 링크 QR 코드', '카메라로 찍으면 이 명함이 열려요'] };
+    const img = document.getElementById('qrImg'), cap = document.getElementById('qrCap'), tabs = document.querySelectorAll('.qt');
+    function pick(k){ if (!Q[k]) k = 'contact'; img.src = Q[k][0]; img.alt = Q[k][1]; cap.textContent = Q[k][2]; tabs.forEach(t => { const on = t.dataset.q === k; t.classList.toggle('on', on); t.setAttribute('aria-selected', on); }); try { localStorage.setItem('qrMode', k); } catch (e) {} }
+    tabs.forEach(t => t.addEventListener('click', () => pick(t.dataset.q)));
+    let saved = null; try { saved = localStorage.getItem('qrMode'); } catch (e) {}
+    pick(saved || 'contact');
+    new Image().src = Q.link[0]; new Image().src = Q.contact[0];
+  })();
+</script>
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet" role="dialog" aria-live="polite"></div>
 <script>
